@@ -1,12 +1,13 @@
 # Using CentOS 7 as base image to support rpmbuild (packages will be Dist el7)
-FROM centos:7
+FROM --platform=linux/arm64 centos:7
 
 # Copying all contents of rpmbuild repo inside container
 COPY . .
 
 # Installing tools needed for rpmbuild ,
 # depends on BuildRequires field in specfile, (TODO: take as input & install)
-RUN yum install -y rpm-build rpmdevtools gcc make coreutils python git nodejs
+RUN yum -y update && yum clean all && yum install -y epel-release
+RUN yum install -y rpm-build rpmdevtools gcc make coreutils python git nodejs npm
 
 # Setting up node to run our JS file
 # Download Node Linux binary
@@ -16,9 +17,10 @@ RUN yum install -y rpm-build rpmdevtools gcc make coreutils python git nodejs
 # RUN tar --strip-components 1 -xvf node-v* -C /usr/local
 
 # Install dependecies and build main.js
+# RUN npm install
 RUN npm install --production && npm run-script build
 
 # All remaining logic goes inside main.js ,
 # where we have access to both tools of this container and
 # contents of git repo at /github/workspace
-ENTRYPOINT ["node", "/lib/main.js"]
+ENTRYPOINT ["/usr/bin/node", "/lib/main.js"]
