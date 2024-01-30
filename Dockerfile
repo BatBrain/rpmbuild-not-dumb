@@ -16,8 +16,7 @@ RUN yum install -y rpm-build rpmdevtools gcc make coreutils python git nodejs
 RUN tar --strip-components 1 -xvf node-v* -C /usr/local
 
 # Install dependecies and build main.js
-RUN npm install --production &&
-  npm run-script build
+RUN npm install --production && npm run-script build
 
 # All remaining logic goes inside main.js ,
 # where we have access to both tools of this container and
